@@ -75,12 +75,41 @@ class InstagramTelegramBot {
             this.settings = config.settings;
             console.log(`Loaded ${this.accounts.length} accounts`);
 
+            try {
+                const timestampsData = await fs.readFile('timestamps.json', 'utf8');
+                const parsedTimestamps = JSON.parse(timestampsData);
+                this.lastCheckedPostTimestamps = Object.keys(parsedTimestamps).reduce((acc, key) => {
+                    acc[key] = parsedTimestamps[key] ? new Date(parsedTimestamps[key]) : null;
+                    return acc;
+                }, {});
+                console.log('Loaded saved timestamps:', this.lastCheckedPostTimestamps);
+            } catch (e) {
+                console.log('No saved timestamps found, initializing empty');
+                this.lastCheckedPostTimestamps = {};
+            }
+
             this.accounts.forEach(account => {
-                this.lastCheckedPostTimestamps[account.instagram_business_id] = null;
+                if (!this.lastCheckedPostTimestamps[account.instagram_business_id]) {
+                    this.lastCheckedPostTimestamps[account.instagram_business_id] = null;
+                }
             });
         } catch (error) {
             console.error('Error in config:', error);
             process.exit(1);
+        }
+    }
+
+    async saveTimestamps() {
+        try {
+            const timestampsToSave = Object.keys(this.lastCheckedPostTimestamps).reduce((acc, key) => {
+                acc[key] = this.lastCheckedPostTimestamps[key]?.toISOString() || null;
+                return acc;
+            }, {});
+            
+            await fs.writeFile('timestamps.json', JSON.stringify(timestampsToSave, null, 2));
+            console.log('Timestamps saved successfully');
+        } catch (error) {
+            console.error('Error saving timestamps:', error);
         }
     }
 
@@ -115,15 +144,22 @@ class InstagramTelegramBot {
                 );
 
                 const lastTimestamp = this.lastCheckedPostTimestamps[account.instagram_business_id];
+                const currentTimestamp = new Date(sortedPosts[0].timestamp);
+
+                console.log(`Current timestamp for ${account.name}:`, currentTimestamp);
+                console.log(`Last saved timestamp for ${account.name}:`, lastTimestamp);
 
                 if (!lastTimestamp) {
-                    this.lastCheckedPostTimestamps[account.instagram_business_id] = new Date(sortedPosts[0].timestamp);
-                    console.log(`timestamp initialized for ${account.name}:`, this.lastCheckedPostTimestamps[account.instagram_business_id]);
+                    this.lastCheckedPostTimestamps[account.instagram_business_id] = currentTimestamp;
+                    console.log(`Initializing timestamp for ${account.name}:`, currentTimestamp);
+                    await this.saveTimestamps();
                     continue;
                 }
-                const newPosts = sortedPosts.filter(post =>
-                    new Date(post.timestamp) > lastTimestamp
-                );
+
+                const newPosts = sortedPosts.filter(post => {
+                    const postDate = new Date(post.timestamp);
+                    return postDate.getTime() > lastTimestamp.getTime();
+                });
 
                 if (newPosts.length > 0) {
                     console.log(`Found ${newPosts.length} new posts for ${account.name}`);
@@ -133,8 +169,9 @@ class InstagramTelegramBot {
                         await new Promise(resolve => setTimeout(resolve, this.settings.retry_delay));
                     }
 
-                    this.lastCheckedPostTimestamps[account.instagram_business_id] = new Date(sortedPosts[0].timestamp);
-                    console.log(`Timestamp updated for ${account.name}`);
+                    this.lastCheckedPostTimestamps[account.instagram_business_id] = currentTimestamp;
+                    await this.saveTimestamps();
+                    console.log(`Updated timestamp for ${account.name} to:`, currentTimestamp);
                 } else {
                     console.log(`No new posts for ${account.name}`);
                 }
