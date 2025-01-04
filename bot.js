@@ -1,17 +1,7 @@
-const http = require('http');
-const port = process.env.PORT || 8080;
-const isAzure = process.env.WEBSITE_SITE_NAME !== undefined;
-
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot is running');
-});
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const fs = require('fs').promises;
-
-const SHUTDOWN_TIMEOUT = 10000; // 10 секунд для graceful shutdown
 
 class InstagramTelegramBot {
     constructor() {
@@ -19,14 +9,6 @@ class InstagramTelegramBot {
             if (!process.env.TELEGRAM_BOT_TOKEN) {
                 throw new Error('TELEGRAM_BOT_TOKEN is not set in environment variables');
             }
-            server.listen(port, () => {
-                console.log(`HTTP server is running on port ${port}`);
-            });
-
-            if (!process.env.TELEGRAM_BOT_TOKEN) {
-                throw new Error('TELEGRAM_BOT_TOKEN is not set in environment variables');
-            }
-        
             
             this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { 
                 polling: true,
@@ -34,11 +16,6 @@ class InstagramTelegramBot {
                 request: {
                     timeout: 30000
                 }
-            });
-
-            server.on('error', (error) => {
-                console.error('HTTP server error:', error);
-                this.shutdown();
             });
 
             this.telegramBot.on('polling_error', (error) => {
@@ -66,31 +43,6 @@ class InstagramTelegramBot {
             this.accounts = [];
             this.settings = {};
             this.init();
-
-            // Добавляем обработчики сигналов
-            process.on('SIGTERM', () => {
-                console.log('Received SIGTERM signal');
-                this.shutdown();
-            });
-
-            process.on('SIGINT', () => {
-                console.log('Received SIGINT signal');
-                this.shutdown();
-            });
-
-            // Специальная обработка для Azure
-            if (isAzure) {
-                console.log('Running in Azure environment');
-                process.on('SIGTERM', () => {
-                    console.log('Received SIGTERM signal from Azure');
-                    this.shutdown();
-                });
-
-                // Пинг для поддержания работы приложения
-                setInterval(() => {
-                    console.log('Azure keep-alive ping');
-                }, 240000); // каждые 4 минуты
-            }
         } catch (error) {
             console.error('Error in bot initialization:', error);
             process.exit(1);
@@ -100,46 +52,9 @@ class InstagramTelegramBot {
     async shutdown() {
         console.log('Shutting down gracefully...');
         try {
-            const forceShutdownTimer = setTimeout(() => {
-                console.log('Force shutdown due to timeout');
-                process.exit(1);
-            }, SHUTDOWN_TIMEOUT);
-
-            if (this.telegramBot) {
-                try {
-                    await this.telegramBot.stopPolling();
-                    console.log('Bot polling stopped');
-                } catch (error) {
-                    console.error('Error stopping telegram bot:', error);
-                }
-            }
-
-            if (server) {
-                await new Promise((resolve) => {
-                    server.close(() => {
-                        console.log('HTTP server closed');
-                        resolve();
-                    });
-                });
-            }
-
-            clearTimeout(forceShutdownTimer);
-            
-            try {
-                await this.saveTimestamps();
-                console.log('State saved successfully');
-            } catch (error) {
-                console.error('Error saving state:', error);
-            }
-
-            console.log('Graceful shutdown completed');
-            
-            if (isAzure) {
-                console.log('Waiting for Azure to handle the shutdown...');
-                await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-            
-            process.exit(0);
+            await this.telegramBot.stopPolling();
+            console.log('Bot polling stopped');
+            process.exit(1);
         } catch (error) {
             console.error('Error during shutdown:', error);
             process.exit(1);
