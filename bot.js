@@ -1,3 +1,10 @@
+const http = require('http');
+const port = process.env.PORT || 8080;
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot is running');
+});
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
@@ -9,6 +16,14 @@ class InstagramTelegramBot {
             if (!process.env.TELEGRAM_BOT_TOKEN) {
                 throw new Error('TELEGRAM_BOT_TOKEN is not set in environment variables');
             }
+            server.listen(port, () => {
+                console.log(`HTTP server is running on port ${port}`);
+            });
+
+            if (!process.env.TELEGRAM_BOT_TOKEN) {
+                throw new Error('TELEGRAM_BOT_TOKEN is not set in environment variables');
+            }
+        
             
             this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { 
                 polling: true,
@@ -16,6 +31,11 @@ class InstagramTelegramBot {
                 request: {
                     timeout: 30000
                 }
+            });
+
+            server.on('error', (error) => {
+                console.error('HTTP server error:', error);
+                this.shutdown();
             });
 
             this.telegramBot.on('polling_error', (error) => {
@@ -54,7 +74,11 @@ class InstagramTelegramBot {
         try {
             await this.telegramBot.stopPolling();
             console.log('Bot polling stopped');
-            process.exit(1);
+
+            server.close(() => {
+                console.log('HTTP server closed');
+                process.exit(1);
+            });
         } catch (error) {
             console.error('Error during shutdown:', error);
             process.exit(1);
