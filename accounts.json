@@ -1,0 +1,129 @@
+{
+  "accounts": [
+    {
+      "name": "Community Shymkent Hub",
+      "instagram_access_token": "EAAlKucnLCjwBOwh3cbr5ukd5ZCnQXEsKVZCvq9OU3h1sTdkptpBrtusD7hk01UUtMKcyS4GTD1TLwWwJdLPdxnrc9GqD7ZCR7psowFIzloj1lNvhHD5vJZAmXJgD5LA83iT72jz4w8PKfehEe8cZAOZAt3RQjIMXdsujZCeOcJ5V9wBwRBC5sWuzBjM",
+      "instagram_business_id": "2615436605327932",
+      "telegram_chat_id": "-1002292690429",
+      "enabled": true
+    },
+    {
+      "name": "Community Qostanai Hub",
+      "instagram_access_token": "EAAHsEevZAOswBOxouak6gBtwnTI12G19JL41nPnExqOWplC95AogvjfWslg4L0hgJuzHLFDCI4AqH5L4EZBW0yUvvc4pOngueZB5xHeXkpQ8bR8HFMZAEJrdtZAhcosZAYOPgNPXgZBCkjeZClZBMVZCKPoaIhnRHypeX4cZCZAiOZCkO70cXrHHNOQksSYFq",
+      "instagram_business_id": "541036692191948",
+      "telegram_chat_id": "-1001764902025",
+      "enabled": true
+    },
+    {
+      "name": "Community Jaiq Hub",
+      "instagram_access_token": "EAAUnZCZBtklOgBO376xrsPfSpdDjsklv7I0rqGcIcmfYd7BJWkhxfYKTfd25PZAfdSIBWMOUdXriZBsVItQP76ZAyXYvmttL0hzcvkAiJ4QFAOigQZB07ZBUTTv3AVS8eZCkPTaZCmhtZC6ekydJ0YCXZClyA7gLrYTUpIPK6iauwZBKKpB7KuzqA77WxXxa",
+      "instagram_business_id": "1451355002934504",
+      "telegram_chat_id": "-1001975293101",
+      "enabled": true
+    },
+    {
+      "name": "Community Oskemen Hub",
+      "instagram_access_token": "EAAOZBLjlWxHoBOZBDzgMpXuE9YEZAhbPq5jzYfClNIS1tRqti8XREPnCGRQmZBn1p8LTgepA7LHgWHr2u3NyeeXbScm0XmGdyWJZBvhsk3jf22ZAk51T3ukZBQAugZAQ1pYjuoEuy7F1zETIHFudn78LqHaFBWXZAWA98EMuSP2QpyMtE66RwjowPKocR",
+      "instagram_business_id": "1053530669892730",
+      "telegram_chat_id": "-1001861815163",
+      "enabled": true
+    },
+    {
+      "name": "Community Turkistan Hub",
+      "instagram_access_token": "EAAIQ88LHlBgBO2W08jUCY0cTDW6tk60zDYYYMwbyXIw3rVMjnT1f8k8KlzkzwJb5MOtv8UZBReIcLuUZBhaZBlUKEijqu9fPZAfJEZCqpso0CvsLLWv3bzn8bUSeZBBpJGu8hh2IiEAu0X9to0A1u1SPHZBvQpRmN2FkGKvqqWMoB3ZBlueoIeAfhRUy",
+      "instagram_business_id": "581589084378136",
+      "telegram_chat_id": "-1001518160838",
+      "enabled": true
+    },
+    {
+      "name": "Community Aqmola Hub",
+      "instagram_access_token": "EAAPTFpV0uvcBO79ZCopzLb4VFpF5TVRb0t1G0StD0oX1Ev1YCZAwTJ4aY1t4c3W3ox3vwfO3Kta0IyAl0oQWbzRkZCtZCPgDnh5ZBxUGuBJoHtwoR6dYXJNEuhjHI47TALUekXl2Vr6tWHLMYQOKEfMoIR3e2h1zBGCZCX54djE4W2dBC8WRpQ9Ch7",
+      "instagram_business_id": "1076518880328439",
+      "telegram_chat_id": "-1001911973152",
+      "enabled": true
+    },
+    {
+      "name": "Community SKO IT Hub",
+      "instagram_access_token": "EAAZAmqCi3h4MBO40uvF4qsQNelZCDPv3RqGG70s7LWfSIUQnquQ4CaMlau3poGhTxab85ATuj7y9lXJ5mFfxEslAEXkcmXZALt20jmYQtEUnFEtK3MVR83OlVPsSxOZC57dZA98ZBLppuRqip68wlKNEwuZBQJ0oNfcdx96yzKw3jxSAbABkCBlOjdi",
+      "instagram_business_id": "1801722283919235",
+      "telegram_chat_id": "-1001520150331",
+      "enabled": true
+    },
+    {
+      "name": "Community Alatau Hub",
+      "instagram_access_token": "EAANkVpjEllUBO7TwhN8HhZCF28ZCIy2Ti9XC9omG8bZCXtcTKP7XhcpTcZAdgREnyyAFAtAMLfBYbuIqs8yfx1o7XNDW8CzASrHBHTSaL5pXo5F35ZC7raI0anJghZAQyfO4me3XqHBRc9RjzXvL7t6Tw80RZCZArTNZB9y00skrzxZCgysaZAJUpovDZBCr",
+      "instagram_business_id": "954748023117397",
+      "telegram_chat_id": "-1002186626461",
+      "enabled": true
+    },
+    {
+      "name": "Kyzylorda Hub community",
+      "instagram_access_token": "EAAMH2U4inZBUBO2fMEsfdFjx172MmsVTq2z3TK0Fcr69uE96DEvwT5qwrvv0088QmkYKZC4ZAwRKIOOt5NzpkkyfHdpwceRYpx2sXM3NVgVrb54nGBKmlmkrZAHZBb548Jtj2MXVixZBUyZCmOtiU50zgGFW8qnMXxx0wnZCzezwCR6KBFC5DIcZC9Gg3",
+      "instagram_business_id": "853054830321637",
+      "telegram_chat_id": "-1001549782453",
+      "enabled": true
+    },
+    {
+      "name": "Community Abai IT Valley",
+      "instagram_access_token": "EAAys5gLQHXABOwroAsqnDmJMZAuCmB1nHiYwnDrz0g0ZAgtGAMjQGqrLLChY0IdCBGlQ9H9syAgZARSJFQFZATjet1KUn90ZA5ZCbzZCcz1lXfH0fIUqG46ny4ovNV9eRirxrznD7kahnxSpGF136b3MM2Op6pWVRwGvZAJr5pZA8YHeONllacM1IoXSLyXmq516ZC",
+      "instagram_business_id": "3567803610176880",
+      "telegram_chat_id": "-1001881507566",
+      "enabled": true
+    },
+    {
+      "name": "Community Ulytau Hub",
+      "instagram_access_token": "EAASmK3M6O4ABO9DLlnWtBgkYcFVtSUJfQ5abCD8PapKcKv35ug1C5VZBqTwp0MMuFA2xCtz9BcVutr8F506RtqKbXiD6hjZCZBQmF8fNozAQcdMKAvZCL4TjXJWiAa00uHiu4Lf5zk82ZBiqRdvQosKZAIgfV1QMFhkftvuDobWxmD1Yz2JZAPt8zVbyV5HthfP",
+      "instagram_business_id": "1308605453843328",
+      "telegram_chat_id": "-1002432818641",
+      "enabled": true
+    },
+    {
+      "name": "Aqtobe Hub",
+      "instagram_access_token": "EAAXbZBxfKA40BO3NpYKzZAaF2aZBCQqofqn1cKARR4A340liRFAABFS1aLQNTNu8xdF3NXDTHb5bIFqUqOKYnrGi99JVXsOyHnkKOLt332iKykjjn0ObYohmvjZBgbmV5O6dxUXNRPdBzEOPPwpM1ACMcuq0SAri1UDgZCoPjAJxwe1oruR8lASxK",
+      "instagram_business_id": "528120333187566",
+      "telegram_chat_id": "-1001795763425",
+      "enabled": true
+    },
+    {
+      "name": "Atyrau Hub",
+      "instagram_access_token": "EAASByijI6OcBO2jSkzp9Jpk6guXcUZBP1tk0zqOtStijQEEO3WZChBXkEvhbcywx1hcvZC4I53pTzYbJaloT9RmSWbYd3cJE285IzxPcgeWvLrqYs6wPspXfgZC6ax10d7Y5i3Av2YdxuAPSSm8GJGLalucbZC5nX324tD80ZBsMZAsrNIKMVExg25W",
+      "instagram_business_id": "857071369926625",
+      "telegram_chat_id": "-1001823850067",
+      "enabled": true
+    },
+    {
+      "name": "Jetisu Digital",
+      "instagram_access_token": "EAAToO1CVTT0BOxeECk8I8ihqAziHm8Yk8w6XG5L2srKZB9SrYZBSKDAlRb004IMXJYjIX0ioIZClUJyJRsgZAJrX4XP3DE1clxQYyVNCF5qcNVqgwKDUp557nzHwOBDSSZBoE8fKcDugUNi5wxYTS8UyaJq6TRSXGkZBHKyM1Cv8rp33TqfWeHV2pE",
+      "instagram_business_id": "1110085694069079",
+      "telegram_chat_id": "-1001804584199",
+      "enabled": true
+    },
+    {
+      "name": "Mangystau Hub",
+      "instagram_access_token": "EAAWq989N9hABO4BussectAo78tphVzsK4DZC1yO9gnPFIzVBAwYIE1LbUyppKfIhqXZARwEYeJNUdLyOxtboNkZAmZCjwFlUAb0jUev46aXdRH0OTUjX7dgwZABZBVvEtp63m1wgM2ZBp4f16Q6iAxi23ZAv0ZCurbThzkyXzY7Rh4GetJoQnKdfPfDNy",
+      "instagram_business_id": "803078168534866",
+      "telegram_chat_id": "-1001900981286",
+      "enabled": true
+    },
+    {
+      "name": "Pavlodar Hub",
+      "instagram_access_token": "EAASeRXgQ0fMBO7Xo4puvTFxUSxdKB0LXVFAt7ZCfxePt6YK2ZA9cbMiWCV1NvYC9Nnn6iFU9QdKcryO6J1wDov1VBjJNTp9tS3flO5ZBP7wskmTPHyhUigfDUiPwoCqhQmtrE9zLLLr0dO13InyH7jvkZCvgps2ixinGz0MKHE2y2kCYfydVO6Xn",
+      "instagram_business_id": "484211554667930",
+      "telegram_chat_id": "-1001699055116",
+      "enabled": true
+    },
+    {
+      "name": "Zhambyl Hub",
+      "instagram_access_token": "EAAG3ZAiD3lJ4BOwQykWzRDN7ZC2T7BvRyzZCA1PCDSbP4c1q8LEwfJX5S3td5IPPzfmfPEOS3DDEJoraWulOJphfZAfTJLRQp86VBqPZCZASlZCIcvsSmZBYrZBHbdL9B3ESdk3RyjZAQStrlUuiPOsTrLtLLRYsVpm02MlJDtmUyVgmb9jtMhiLsMfwXE",
+      "instagram_business_id": "609681408184211",
+      "telegram_chat_id": "-1001743116501",
+      "enabled": true
+    }
+
+  ],
+  "settings": {
+    "check_interval": 3600000,
+    "retry_delay": 120000,
+    "max_caption_length": 1000
+  }
+}
