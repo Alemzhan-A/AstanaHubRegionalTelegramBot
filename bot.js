@@ -2,6 +2,7 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const fs = require('fs').promises;
+const logger = require('./logger');
 
 class InstagramTelegramBot {
     constructor() {
@@ -9,8 +10,8 @@ class InstagramTelegramBot {
             if (!process.env.TELEGRAM_BOT_TOKEN) {
                 throw new Error('TELEGRAM_BOT_TOKEN is not set in environment variables');
             }
-            
-            this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { 
+
+            this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {
                 polling: true,
                 onlyFirstMatch: true,
                 request: {
@@ -19,18 +20,18 @@ class InstagramTelegramBot {
             });
 
             this.telegramBot.on('polling_error', (error) => {
-                console.error('Telegram polling error:', error);
+                logger.error('Telegram polling error:', error);
                 if (error.code === 'ETELEGRAM') {
-                    console.error('Critical Telegram API error. Check your token and permissions.');
+                    logger.error('Critical Telegram API error. Check your token and permissions.');
                 }
             });
 
             this.telegramBot.on('error', (error) => {
-                console.error('Telegram bot error:', error);
+                logger.error('Telegram bot error:', error);
             });
 
             process.on('uncaughtException', (error) => {
-                console.error('Uncaught Exception:', error);
+                logger.error('Uncaught Exception:', error);
                 this.shutdown();
             });
 
@@ -44,19 +45,19 @@ class InstagramTelegramBot {
             this.settings = {};
             this.init();
         } catch (error) {
-            console.error('Error in bot initialization:', error);
+            logger.error('Error in bot initialization:', error);
             process.exit(1);
         }
     }
 
     async shutdown() {
-        console.log('Shutting down gracefully...');
+        logger.info('Shutting down gracefully...');
         try {
             await this.telegramBot.stopPolling();
-            console.log('Bot polling stopped');
+            logger.info('Bot polling stopped');
             process.exit(1);
         } catch (error) {
-            console.error('Error during shutdown:', error);
+            logger.error('Error during shutdown:', error);
             process.exit(1);
         }
     }
@@ -71,9 +72,12 @@ class InstagramTelegramBot {
         try {
             const data = await fs.readFile('accounts.json', 'utf8');
             const config = JSON.parse(data);
-            this.accounts = config.accounts.filter(account => account.enabled);
+            this.accounts = config.accounts.filter(account => account.enabled).map(account => ({
+                ...account,
+                lastProcessedPostId: account.lastProcessedPostId || null
+            }));
             this.settings = config.settings;
-            console.log(`Loaded ${this.accounts.length} accounts`);
+            logger.info(`Loaded ${this.accounts.length} accounts`);
 
             try {
                 const timestampsData = await fs.readFile('timestamps.json', 'utf8');
@@ -82,9 +86,9 @@ class InstagramTelegramBot {
                     acc[key] = parsedTimestamps[key] ? new Date(parsedTimestamps[key]) : null;
                     return acc;
                 }, {});
-                console.log('Loaded saved timestamps:', this.lastCheckedPostTimestamps);
+                logger.info('Loaded saved timestamps:', this.lastCheckedPostTimestamps);
             } catch (e) {
-                console.log('No saved timestamps found, initializing empty');
+                logger.info('No saved timestamps found, initializing empty');
                 this.lastCheckedPostTimestamps = {};
             }
 
@@ -94,22 +98,28 @@ class InstagramTelegramBot {
                 }
             });
         } catch (error) {
-            console.error('Error in config:', error);
+            logger.error('Error in config:', error);
             process.exit(1);
         }
     }
 
-    async saveTimestamps() {
+    async saveState() {
         try {
             const timestampsToSave = Object.keys(this.lastCheckedPostTimestamps).reduce((acc, key) => {
                 acc[key] = this.lastCheckedPostTimestamps[key]?.toISOString() || null;
                 return acc;
             }, {});
-            
             await fs.writeFile('timestamps.json', JSON.stringify(timestampsToSave, null, 2));
-            console.log('Timestamps saved successfully');
+
+            const accountsData = {
+                accounts: this.accounts,
+                settings: this.settings
+            };
+            await fs.writeFile('accounts.json', JSON.stringify(accountsData, null, 2));
+
+            logger.info('State saved successfully');
         } catch (error) {
-            console.error('Error saving timestamps:', error);
+            logger.error('Error saving state:', error);
         }
     }
 
@@ -120,7 +130,7 @@ class InstagramTelegramBot {
     }
 
     startAutoSync() {
-        console.log('Automatic sync started');
+        logger.info('Automatic sync started');
         this.checkAllAccounts();
 
         setInterval(() => {
@@ -131,11 +141,11 @@ class InstagramTelegramBot {
     async checkAllAccounts() {
         for (const account of this.accounts) {
             try {
-                console.log(`\nChecking account: ${account.name}`);
+                logger.info(`\nChecking account: ${account.name}`);
                 const posts = await this.getInstagramPosts(account);
 
                 if (!posts.length) {
-                    console.log(`No posts for ${account.name}`);
+                    logger.info(`No posts for ${account.name}`);
                     continue;
                 }
 
@@ -146,38 +156,49 @@ class InstagramTelegramBot {
                 const lastTimestamp = this.lastCheckedPostTimestamps[account.instagram_business_id];
                 const currentTimestamp = new Date(sortedPosts[0].timestamp);
 
-                console.log(`Current timestamp for ${account.name}:`, currentTimestamp);
-                console.log(`Last saved timestamp for ${account.name}:`, lastTimestamp);
+                logger.info(`Current timestamp for ${account.name}:`, currentTimestamp);
+                logger.info(`Last saved timestamp for ${account.name}:`, lastTimestamp);
+
+                const lastProcessedPostId = account.lastProcessedPostId;
+                if (lastProcessedPostId === sortedPosts[0].id) {
+                    logger.info(`Post ${lastProcessedPostId} was already processed for ${account.name}`);
+                    continue;
+                }
 
                 if (!lastTimestamp) {
                     this.lastCheckedPostTimestamps[account.instagram_business_id] = currentTimestamp;
-                    console.log(`Initializing timestamp for ${account.name}:`, currentTimestamp);
-                    await this.saveTimestamps();
+                    account.lastProcessedPostId = sortedPosts[0].id;
+                    await this.saveState();
                     continue;
                 }
 
                 const newPosts = sortedPosts.filter(post => {
                     const postDate = new Date(post.timestamp);
-                    return postDate.getTime() > lastTimestamp.getTime();
+                    const timeDiff = Math.abs(postDate.getTime() - lastTimestamp.getTime());
+                    return postDate.getTime() > lastTimestamp.getTime() && timeDiff > 60000;
                 });
 
                 if (newPosts.length > 0) {
-                    console.log(`Found ${newPosts.length} new posts for ${account.name}`);
+                    logger.info(`Found ${newPosts.length} new posts for ${account.name}`);
 
                     for (const post of newPosts) {
-                        await this.sendPost(post, account);
-                        await new Promise(resolve => setTimeout(resolve, this.settings.retry_delay));
+                        if (post.id !== lastProcessedPostId) {
+                            await this.sendPost(post, account);
+                            account.lastProcessedPostId = post.id;
+                            await this.saveState();
+                            await new Promise(resolve => setTimeout(resolve, this.settings.retry_delay));
+                        }
                     }
 
                     this.lastCheckedPostTimestamps[account.instagram_business_id] = currentTimestamp;
-                    await this.saveTimestamps();
-                    console.log(`Updated timestamp for ${account.name} to:`, currentTimestamp);
+                    await this.saveState();
+                    logger.info(`Updated timestamp for ${account.name} to:`, currentTimestamp);
                 } else {
-                    console.log(`No new posts for ${account.name}`);
+                    logger.info(`No new posts for ${account.name}`);
                 }
 
             } catch (error) {
-                console.error(`Error in ${account.name}:`, error);
+                logger.error(`Error in ${account.name}:`, error);
             }
 
             await new Promise(resolve => setTimeout(resolve, this.settings.retry_delay));
@@ -197,7 +218,7 @@ class InstagramTelegramBot {
             });
 
             if (!response.data.data || response.data.data.length === 0) {
-                console.error(`Facebook page not found for ${account.name}`);
+                logger.error(`Facebook page not found for ${account.name}`);
                 return [];
             }
 
@@ -210,7 +231,7 @@ class InstagramTelegramBot {
             });
 
             if (!instagramResponse.data.instagram_business_account) {
-                console.error(`Instagram page not found for ${account.name}`);
+                logger.error(`Instagram page not found for ${account.name}`);
                 return [];
             }
 
@@ -222,13 +243,13 @@ class InstagramTelegramBot {
                 }
             });
 
-            console.log(`Got ${mediaResponse.data.data.length} posts for ${account.name}`);
+            logger.info(`Got ${mediaResponse.data.data.length} posts for ${account.name}`);
             return mediaResponse.data.data || [];
 
         } catch (error) {
-            console.error(`Error in Instagram API for ${account.name}:`, error);
+            logger.error(`Error in Instagram API for ${account.name}:`, error);
             if (error.response?.data?.error?.message) {
-                console.error('API Error details:', error.response.data.error);
+                logger.error('API Error details:', error.response.data.error);
             }
             return [];
         }
@@ -247,7 +268,7 @@ class InstagramTelegramBot {
                         return await fn();
                     } catch (error) {
                         if (i === attempts - 1) throw error;
-                        console.log(`Retry attempt ${i + 1} of ${attempts}`);
+                        logger.info(`Retry attempt ${i + 1} of ${attempts}`);
                         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
                     }
                 }
@@ -255,7 +276,7 @@ class InstagramTelegramBot {
 
             switch (post.media_type) {
                 case 'VIDEO':
-                    console.log('Sending Video');
+                    logger.info('Sending Video');
                     await retry(async () => {
                         await this.telegramBot.sendVideo(
                             account.telegram_chat_id,
@@ -278,7 +299,7 @@ class InstagramTelegramBot {
                     break;
 
                 case 'IMAGE':
-                    console.log('Sending Photo');
+                    logger.info('Sending Photo');
                     await retry(async () => {
                         await this.telegramBot.sendPhoto(
                             account.telegram_chat_id,
@@ -297,7 +318,7 @@ class InstagramTelegramBot {
                     break;
 
                 case 'CAROUSEL_ALBUM':
-                    console.log('Carousel processing');
+                    logger.info('Carousel processing');
                     const carouselResponse = await axios.get(`https://graph.facebook.com/v21.0/${post.id}/children`, {
                         params: {
                             fields: 'media_type,media_url,thumbnail_url',
@@ -344,12 +365,12 @@ class InstagramTelegramBot {
                     break;
 
                 default:
-                    console.log(`unable to get this type of media: ${post.media_type}`);
+                    logger.info(`unable to get this type of media: ${post.media_type}`);
             }
         } catch (error) {
-            console.error(`Error in sending post for ${account.name}:`, error);
+            logger.error(`Error in sending post for ${account.name}:`, error);
             if (error.response) {
-                console.error('Error response:', {
+                logger.error('Error response:', {
                     status: error.response.status,
                     data: error.response.data
                 });
