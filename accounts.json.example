@@ -1,0 +1,17 @@
+{
+  "accounts": [
+    {
+      "name": "Example Account",
+      "instagram_access_token": "your_instagram_token_here",
+      "instagram_business_id": "your_business_id_here",
+      "telegram_chat_id": "your_telegram_chat_id_here",
+      "enabled": true,
+      "lastProcessedPostId": null
+    }
+  ],
+  "settings": {
+    "check_interval": 7200000,
+    "retry_delay": 240000,
+    "max_caption_length": 1000
+  }
+} 

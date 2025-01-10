@@ -8,5 +8,6 @@ node_modules/
 # Environment variables
 .env
 
-# Other
-.DS_Store
+# Sensitive data
+accounts.json
+timestamps.json
